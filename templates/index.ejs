@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .user-list {
+            margin: 20px 0;
+        }
+        .user-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .admin {
+            background-color: #ffe0e0;
+        }
+    </style>
+</head>
+<body>
+    <h1><%= title %></h1>
+    
+    <h2>All Users</h2>
+    <div class="user-list">
+        <% users.forEach(user => { %>
+            <div class="user-item <%= user.role === 'admin' ? 'admin' : '' %>">
+                <strong><%= user.name %></strong> - <%= user.role %>
+            </div>
+        <% }); %>
+    </div>
+    
+    <h2>Admin Users Only</h2>
+    <div class="user-list">
+        <% admins.forEach(admin => { %>
+            <div class="user-item admin">
+                <strong><%= admin.name %></strong>
+            </div>
+        <% }); %>
+    </div>
+</body>
+</html>
