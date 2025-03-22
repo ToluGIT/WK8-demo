@@ -1,0 +1,26 @@
+{
+  "name": "secure-web-app-demo",
+  "version": "1.0.0",
+  "description": "A demo application for secure CI/CD pipeline training",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "security",
+    "cicd",
+    "demo"
+  ],
+  "author": "ToluGIT",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ejs": "^3.1.6",
+    "lodash": "4.17.15"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0"
+  }
+}
