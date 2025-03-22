@@ -1,0 +1,63 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      # Install security scanning tools
+      - npm install -g npm@latest
+      - npm install -g snyk@latest
+      - npm install -g retire@latest
+      - npm install -g auditjs@latest
+      - echo "Security tools installed!"
+
+  pre_build:
+    commands:
+      # Install project dependencies
+      - npm install
+      
+      # Run dependency vulnerability scanning
+      - echo "Running dependency vulnerability scan..."
+      - npm audit --json > npm-audit-results.json || true
+      - retire --outputformat json --outputpath retire-results.json || true
+      - snyk test --json > snyk-results.json || true
+      
+      # Check for secrets in code
+      - echo "Checking for hardcoded secrets..."
+      - grep -r --include="*.js" --include="*.json" --include="*.yml" -E '(password|secret|key|token).*["\x27][a-zA-Z0-9_!@#$%^&*()-=+]{8,}["\x27]' . || echo "No obvious secrets found"
+
+  build:
+    commands:
+      # Run Static Application Security Testing
+      - echo "Running static code analysis..."
+      - npm run lint || echo "Linting issues found"
+      
+      # Run security checks on node modules
+      - auditjs ossi --json > auditjs-results.json || true
+      
+      # Analyze results to determine if build should fail
+      - echo "Analyzing security results..."
+      - |
+        if grep -q '"critical": [1-9]' npm-audit-results.json; then
+          echo "CRITICAL vulnerabilities found in npm audit!"
+          cat npm-audit-results.json
+          # Uncomment the line below to fail the build on critical vulnerabilities
+          # exit 1
+        else
+          echo "No critical npm vulnerabilities found."
+        fi
+
+  post_build:
+    commands:
+      # Combine security reports
+      - echo "Security scanning completed!"
+      - echo "Security results are stored in S3 and available in build logs."
+
+artifacts:
+  files:
+    - npm-audit-results.json
+    - retire-results.json
+    - snyk-results.json
+    - auditjs-results.json
+  discard-paths: no
